@@ -113,6 +113,7 @@ class SparseMatrix(object):
             elif step >= np.log(self.dim):
                 break
             step += 1
+            value_vector = new_values
         rank = sorted(enumerate(value_vector), key=lambda x: -x[1])
         return rank[:top]
 
