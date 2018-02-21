@@ -106,7 +106,9 @@ class SparseMatrix(object):
                     # contribute to neighbors
                     new_values[j] += value_vector[i] / len(self.graph[i])
             new_values = new_values * (1 - self_ref) + self_ref * value_vector
-            if new_values.dot(value_vector) < 1e-4:
+            if new_values.dot(value_vector) / (
+                        np.linalg.norm(value_vector) *
+                        np.linalg.norm(new_values)) < 1e-4:
                 break
             elif step >= np.log(self.dim):
                 break
