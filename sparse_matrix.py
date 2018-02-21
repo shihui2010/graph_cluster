@@ -111,7 +111,7 @@ class SparseMatrix(object):
             elif step >= np.log(self.dim):
                 break
         rank = sorted(enumerate(value_vector), key=lambda x: -x[1])
-        return [i[0] for i in rank[:top]]
+        return rank[:top]
 
     def split(self):
         id_with_value = zip(range(self.dim), self.singular_v)
@@ -136,6 +136,12 @@ class SparseMatrix(object):
             l += s1 + s2 + s3
             us.append(u)
             ls.append(l)
+            if i == self.dim / 4:
+                print "a quarter of scanning done"
+            if i == self.dim / 2:
+                print "half of scanning done"
+            if i == self.dim / 4 * 3:
+                print "three quarters of scanning done"
         min_conduct, min_idx = 1 << 31, -1
         for i in range(0, self.dim - 2):
             # i=0 for <one, others> cut

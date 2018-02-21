@@ -74,8 +74,18 @@ for level in range(4):
     # 4-levels tree
     lower_leaves = list()
     for idx, leaf in enumerate(leaves):
+        path = "tree/" + str(level) + "_" + str(idx)
+        leaf.save(path)
+        print "saved sub-tree"
+        key_entities = leaf.top_influencers(top=100)
+        names = dict()
+        for index, score in key_entities:
+            name = idx2entity[leaf.map_to_root(index)]
+            names[name] = score
+        with open(os.path.join(path, "keys.json"), "w") as fp:
+            json.dump(names, fp, indent=4)
+        print "saved key influencers"
         print "splitting level %d idx %d" % (level, idx)
-        leaf.save("tree/" + str(level) + "_" + str(idx))
         lower_leaves.extend(leaf.split())
     leaves = lower_leaves
     tree.append(leaves)
