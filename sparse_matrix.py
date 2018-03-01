@@ -3,6 +3,7 @@ import os
 import numpy as np
 import random
 import json
+from sys import maxint
 
 
 class SparseMatrix(object):
@@ -139,6 +140,12 @@ class SparseMatrix(object):
             u += s1 - s2
             l += s1 + s2 + s3
             us.append(u)
+            if not u:
+                # split the matrix
+                sorted_id = [i[0] for i in sorted_id_value]
+                left_tree = self._split_matrix(sorted_id[:i])
+                right_tree = self._split_matrix(sorted_id[i:])
+                return left_tree, right_tree
             ls.append(l)
             if i == self.dim / 4:
                 print "a quarter of scanning done"
@@ -150,7 +157,10 @@ class SparseMatrix(object):
         for i in range(0, self.dim - 2):
             # i=0 for <one, others> cut
             # self.dim - 3 for <others, one> cut
-            conduct = float(us[i]) / min(ls[i], ls[-1] - ls[i])
+            try:
+                conduct = float(us[i]) / min(ls[i], ls[-1] - ls[i])
+            except ZeroDivisionError:
+                conduct = maxint
             if conduct < min_conduct:
                 min_conduct = conduct
                 min_idx = i + 1
