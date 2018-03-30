@@ -87,7 +87,7 @@ class SparseMatrix(object):
 
     def AiAj(self, i, j):
         """
-        sine A is binary, symmetry
+        since A is binary, symmetry
         """
         product = 0
         for adj_i in self.graph[i]:
@@ -154,11 +154,15 @@ class SparseMatrix(object):
             if i == self.dim / 4 * 3:
                 print "three quarters of scanning done"
         min_conduct, min_idx = 1 << 31, -1
+
         for i in range(0, self.dim - 2):
             # i=0 for <one, others> cut
             # self.dim - 3 for <others, one> cut
             try:
                 conduct = float(us[i]) / min(ls[i], ls[-1] - ls[i])
+                # add entropy
+                p = float(i + 1) / self.dim
+                conduct += 0.1 * (np.log(p) * p + np.log(1 - p) * (1 - p))
             except ZeroDivisionError:
                 conduct = maxint
             if conduct < min_conduct:
