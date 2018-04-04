@@ -161,8 +161,8 @@ class SparseMatrix(object):
             try:
                 conduct = float(us[i]) / min(ls[i], ls[-1] - ls[i])
                 # add entropy
-                p = float(i + 1) / self.dim
-                conduct += 0.1 * (np.log(p) * p + np.log(1 - p) * (1 - p))
+                # p = float(i + 1) / self.dim
+                # conduct += 0.1 * (np.log(p) * p + np.log(1 - p) * (1 - p))
             except ZeroDivisionError:
                 conduct = maxint
             if conduct < min_conduct:
@@ -212,6 +212,8 @@ class SparseMatrix(object):
             json.dump(list_graph, fp)
         with open(os.path.join(path, "idx_map.json"), "w") as fp:
             json.dump(self.idx_map, fp)
+        with open(os.path.join(path, str(self.dim), ".tmp"), "w") as fp:
+            pass
 
 
 if __name__ == "__main__":

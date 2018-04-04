@@ -2,7 +2,9 @@ from sparse_matrix import SparseMatrix
 import json
 import os
 import re
+from multiprocessing import Pool
 from nltk.stem.porter import PorterStemmer
+
 
 porter_stemmer = PorterStemmer()
 prenoun = {"a", "an", "many", "all", "each", "any", "and", "similar",
@@ -44,6 +46,18 @@ for entity in entity_set:
 print "entities set up", len(graph)
 # print entity2idx
 
+
+def influencer(sp, path):
+    key_entities = sp.top_influencers(top=100)
+    names = dict()
+    for index, score in key_entities:
+        name = idx2entity[leaf.map_to_root(index)]
+        names[name] = score
+    with open(os.path.join(path, "keys.json"), "w") as fp:
+        json.dump(names, fp, indent=4)
+    print "saved key influencers at", path
+
+
 with open("KeyRelation.txt") as fp:
     counter = 0
     for line in fp:
@@ -65,27 +79,36 @@ print "graph pre-loaded"
 
 
 root = SparseMatrix(graph, None)
+influencer(root, "root")
+root.save("tree/root")
 print "graph constructed"
 
-leaves = [root]
-tree = [leaves]
 
-for level in range(4):
-    # 4-levels tree
-    lower_leaves = list()
-    for idx, leaf in enumerate(leaves):
-        path = "tree/" + str(level) + "_" + str(idx)
-        leaf.save(path)
-        print "saved sub-tree"
-        key_entities = leaf.top_influencers(top=100)
-        names = dict()
-        for index, score in key_entities:
-            name = idx2entity[leaf.map_to_root(index)]
-            names[name] = score
-        with open(os.path.join(path, "keys.json"), "w") as fp:
-            json.dump(names, fp, indent=4)
-        print "saved key influencers"
-        print "splitting level %d idx %d" % (level, idx)
-        lower_leaves.extend(leaf.split())
-    leaves = lower_leaves
-    tree.append(leaves)
+def split_tree(path_name):
+    with open(os.path.join(path_name, "graph.json")) as fp:
+        graph = json.load(fp)
+    with open(os.path.join(path_name, "idx_map.json")) as fp:
+        idx = json.load(fp)
+    sparse_matrix = SparseMatrix(graph, idx)
+    left_child, right_child = sparse_matrix.split()
+
+    left_child.save(path_name + ".L")
+    influencer(left_child, path_name + ".L")
+    right_child.save(path_name + ".R")
+    influencer(right_child, path_name + ".R")
+
+    children_paths = []
+    if left_child.dim > 200:
+        children_paths.append(path_name + ".L")
+    if right_child.dim > 200:
+        children_paths.append(path_name + ".R")
+    return children_paths
+
+pool = Pool()
+cur_level = ["tree/root"]
+for _ in range(9):
+    sub_trees = pool.map(split_tree, cur_level)
+    leaves = []
+    for i in sub_trees:
+        leaves.extend(i)
+    cur_level = leaves
