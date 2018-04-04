@@ -80,7 +80,7 @@ print "graph pre-loaded"
 
 root = SparseMatrix(graph, None)
 root.save("tree/root")
-influencer(root, "root")
+influencer(root, "tree/root")
 print "graph constructed"
 
 
