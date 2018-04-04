@@ -51,7 +51,7 @@ def influencer(sp, path):
     key_entities = sp.top_influencers(top=100)
     names = dict()
     for index, score in key_entities:
-        name = idx2entity[leaf.map_to_root(index)]
+        name = idx2entity[sp.map_to_root(index)]
         names[name] = score
     with open(os.path.join(path, "keys.json"), "w") as fp:
         json.dump(names, fp, indent=4)
