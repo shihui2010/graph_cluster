@@ -79,8 +79,8 @@ print "graph pre-loaded"
 
 
 root = SparseMatrix(graph, None)
-root.save("tree/root")
-influencer(root, "tree/root")
+root.save("test/root")
+influencer(root, "test/root")
 print "graph constructed"
 
 
@@ -89,8 +89,10 @@ def split_tree(path_name):
         graph = json.load(fp)
     with open(os.path.join(path_name, "idx_map.json")) as fp:
         idx = json.load(fp)
+    graph = {int(k): set(v) for k, v in graph.items()}
     sparse_matrix = SparseMatrix(graph, idx)
     left_child, right_child = sparse_matrix.split()
+    print "graph split", path_name
 
     left_child.save(path_name + ".L")
     influencer(left_child, path_name + ".L")
@@ -105,7 +107,7 @@ def split_tree(path_name):
     return children_paths
 
 pool = Pool()
-cur_level = ["tree/root"]
+cur_level = ["test/root"]
 for _ in range(9):
     sub_trees = pool.map(split_tree, cur_level)
     leaves = []
