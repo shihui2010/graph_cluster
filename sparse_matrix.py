@@ -212,7 +212,7 @@ class SparseMatrix(object):
             json.dump(list_graph, fp)
         with open(os.path.join(path, "idx_map.json"), "w") as fp:
             json.dump(self.idx_map, fp)
-        with open(os.path.join(path, str(self.dim), ".tmp"), "w") as fp:
+        with open(os.path.join(path, str(self.dim) + ".tmp"), "w") as fp:
             pass
 
 
