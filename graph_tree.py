@@ -78,7 +78,7 @@ with open("KeyRelation.txt") as fp:
 print "graph pre-loaded"
 
 
-root = SparseMatrix(graph, None)
+root = SparseMatrix(graph, {i: i for i in idx2entity})
 root.save("test/root")
 influencer(root, "test/root")
 print "graph constructed"
@@ -90,7 +90,8 @@ def split_tree(path_name):
     with open(os.path.join(path_name, "idx_map.json")) as fp:
         idx = json.load(fp)
     graph = {int(k): set(v) for k, v in graph.items()}
-    idx = {int(k): int(v) for k, v in idx.items()}
+    if idx is not None:
+        idx = {int(k): int(v) for k, v in idx.items()}
     sparse_matrix = SparseMatrix(graph, idx)
     left_child, right_child = sparse_matrix.split()
     print "graph split", path_name
